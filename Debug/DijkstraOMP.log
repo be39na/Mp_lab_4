@@ -1,0 +1,3 @@
+﻿  DijkstraOMP.cpp
+c1xx : warning C4199: двухэтапный поиск имен не поддерживается для C++/CLI, C++/CX или OpenMP. Используйте /Zc:twoPhase-
+  DijkstraOMP.vcxproj -> C:\Users\david\source\repos\DijkstraOMP\Debug\DijkstraOMP.exe
