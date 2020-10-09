@@ -180,5 +180,53 @@ void Graph::DijkstraOMP(int num_threads)
 	delete[] mins;
 	delete[] min_indexes;
 	return;
+} 
+ 
+void Graph::DijkstraOMPChunks(int chunk)
+{
+	this->prepareOMP();
+	this->distances_OMP[this->start] = 0;
+
+	for (auto i = 0; i < this->size; i++)
+	{
+		auto min = LONG_MAX;
+		auto min_index = -1;
+#pragma omp parallel 
+		{
+			auto local_min = LONG_MAX;
+			auto local_min_index = -1;
+
+#pragma omp for schedule(dynamic, chunk)
+			for (auto j = 0; j < this->size; j++)
+			{
+				if (!this->visited[j] && (this->distances_OMP[j] <= local_min))
+				{
+					local_min = this->distances_OMP[j];
+					local_min_index = j;
+				}
+			}
+
+#pragma omp critical
+			{
+				if (local_min < min)
+				{
+					min = local_min;
+					min_index = local_min_index;
+				}
+			};
+		}
+
+		this->visited[min_index] = true;
+#pragma omp parallel for schedule(dynamic, chunk)
+		for (auto j = 0; j < this->size; j++)
+		{
+			if (this->graph[min_index][j] == 0)
+				continue;
+			if (this->distances_OMP[min_index] + this->graph[min_index][j] < this->distances_OMP[j])
+				this->distances_OMP[j] = this->distances_OMP[min_index] + this->graph[min_index][j];
+		}
+
+	}
+	return;
 }
 

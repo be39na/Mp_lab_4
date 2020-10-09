@@ -24,8 +24,6 @@ public:
 	void prepareOMP();
 	void Dijkstra();
 	void DijkstraOMP(int num_threads);
-	void DijkstraOMPWithChunks(int num_threads, int chunk);
-	void DijkstraOMPCritical();
-	void DijkstraOMPCriticalWithChunks(int chunk);
+	void DijkstraOMPChunks(int chunk);
 	bool compareDistances();
 };

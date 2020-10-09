@@ -8,7 +8,7 @@
 
 using namespace std;
 
-void generateFile(int number, string nameFile)
+void genFile(int number, string nameFile)
 {
 	ofstream out;
 	out.open(nameFile);
@@ -21,16 +21,16 @@ void generateFile(int number, string nameFile)
 	for (auto i = 0; i < number; i++)
 		generated[i] = new int[number];
 
-	cout << "Started generating matrix for size " << number << endl;
+	cout << "Generating matrix for size " << number << endl;
 	for (auto i = 0; i < number; i++)
 	{
 		generated[i][i] = 0;
 		for (auto j = i + 1; j < number; j++)
 			generated[i][j] = generated[j][i] = rand() % 100;
 	}
-	cout << "Finished generating matrix" << endl;
+	cout << "Matrix generated" << endl;
 
-	cout << "Started filling in file" << endl;
+	cout << "Writing file" << endl;
 	for (auto i = 0; i < number; i++)
 	{
 		for (auto j = 0; j < number; j++)
@@ -39,11 +39,11 @@ void generateFile(int number, string nameFile)
 		delete[] generated[i];
 	}
 	delete[] generated;
-	cout << "Finished filling in file" << endl;
+	cout << "File written" << endl;
 	out.close();
 }
 
-bool fileIsExist(string name)
+bool fileExist(string name)
 {
 
 	std::ifstream in;
@@ -65,12 +65,12 @@ int main()
 		name = name + ".txt";
 		int size = 0;
 
-		if (!fileIsExist(name))
+		if (!fileExist(name))
 		{
 			std::cout << "Could not find file -> Generate file\n";
 			std::cout << "Enter size:";
 			std::cin >> size;
-			generateFile(size,name);
+			genFile(size,name);
 		}
 		
 
@@ -86,21 +86,16 @@ int main()
 		
 		for (auto num_threads = 1; num_threads <= max_threads; num_threads++)
 		{
-			
-
-				omp_set_num_threads(num_threads);
-
+							int chunk = graph->size / num_threads;
 				auto start = std::chrono::steady_clock::now();
-				graph->DijkstraOMP(num_threads);
+				graph->DijkstraOMPChunks(chunk);
 				auto finish = std::chrono::steady_clock::now();
-				auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(finish - start);
-				cout << "time: " << duration.count() << " \tThreads: " << num_threads<<"\n";
+				auto duration = std::chrono::duration_cast<std::chrono::microseconds>(finish - start);
+				cout << "time: " << duration.count() << " \tThreads: " << num_threads << "\n" << endl;;
 				
-
 		}
 		
-
-		name = "output" + name;
+		name = "Output" + name;
 		graph->writeToFile(name);
 		delete graph;
 	}
